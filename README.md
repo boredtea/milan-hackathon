@@ -35,6 +35,7 @@ The programs require the following softwares/files/tools:
  * Also update `csv_path` to the path where the local csv is located.
  * Update the `cv2.VideoCapture(1)` index to the appropriate camera.
  * Execute the command `python tesseract_OCR.py` from the terminal.
+ * Execute the command `python tesseract_OCR_sheet.py` from the terminal to make changes to Google sheet which is public.
 
 ## USAGE
 -----
@@ -47,6 +48,7 @@ The programs require the following softwares/files/tools:
 ------------
 * The local csv file gets uploaded to a public google sheet where students can easily search via their name/AWB. Once they've collected their parcel the postal room can edit the sheet as required.
 * The indexing in the sheet also hels the postal room since that is doesn't change their current organising techniques.
+* Google Sheets serve as frontend to the public on a large scale. The public sheet can be found here: [Postal Room](https://docs.google.com/spreadsheets/d/1irjbTqD7PK7vBUHshxY_KLiqYmCUezauY8wChp9GyAo/edit?usp=sharing)
 
  ## FUTURE SCOPE
 ------------
