@@ -9,7 +9,39 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Users\soumi\AppData\Local\Programs\
 # imageText = pytesseract.image_to_string(r'C:\Users\soumi\Documents\Code_stuff\Various_Projects\milan-hackathon\amazonPacket2.jpeg')
 csv_path = 'parcels.csv'
 imagePath = r'C:\Users\soumi\Documents\Code_stuff\Various_Projects\milan-hackathon\amazonPacket2.jpeg'
-imageText = pytesseract.image_to_string(imagePath)
+
+# scan image
+key = cv2. waitKey(1)
+webcam = cv2.VideoCapture(0)
+while True:
+    try:
+        check, frame = webcam.read()
+        print(check) #prints true as long as the webcam is running
+        cv2.imshow("Capturing", frame)
+        key = cv2.waitKey(1)
+        if key == ord('s'): 
+            # cv2.imwrite(filename='saved_img.jpg', img=frame)
+            webcam.release()
+            cv2.waitKey(1650)
+            cv2.destroyAllWindows()
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            break
+        elif key == ord('q'):
+            webcam.release()
+            cv2.destroyAllWindows()
+            break
+        
+    except(KeyboardInterrupt):
+        print("Turning off camera.")
+        webcam.release()
+        print("Camera off.")
+        print("Program ended.")
+        cv2.destroyAllWindows()
+        break
+
+
+
+imageText = pytesseract.image_to_string(gray)
 
 
 lines = imageText.split('\n')
