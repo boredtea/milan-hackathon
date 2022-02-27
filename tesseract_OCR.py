@@ -2,30 +2,60 @@ import cv2
 import pytesseract
 import pandas as pd
 import os
+import csv 
 
 # path to tesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\soumi\AppData\Local\Programs\Tesseract-OCR\tesseract'
 
-# imageText = pytesseract.image_to_string(r'C:\Users\soumi\Documents\Code_stuff\Various_Projects\milan-hackathon\amazonPacket2.jpeg')
-csv_path = 'parcels.csv'
-imagePath = r'C:\Users\soumi\Documents\Code_stuff\Various_Projects\milan-hackathon\amazonPacket2.jpeg'
+# csv path
+csv_path = r'parcels.csv'
 
 # scan image
-key = cv2. waitKey(1)
-webcam = cv2.VideoCapture(0)
+key = cv2.waitKey(1)
+webcam = cv2.VideoCapture(1)
+webcam.set(cv2.CAP_PROP_FRAME_WIDTH, 256)
+webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, 512)
 while True:
     try:
         check, frame = webcam.read()
-        print(check) #prints true as long as the webcam is running
         cv2.imshow("Capturing", frame)
         key = cv2.waitKey(1)
-        if key == ord('s'): 
-            # cv2.imwrite(filename='saved_img.jpg', img=frame)
-            webcam.release()
-            cv2.waitKey(1650)
-            cv2.destroyAllWindows()
+
+        # if s is pressed, make entry in the csv
+        if key == ord('s'):
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            break
+
+            imageText = pytesseract.image_to_string(gray)
+
+            lines = imageText.split('\n')
+            lines = list(filter(None, lines))
+            print(lines)
+            index_awb = 0
+            index_name = 0
+            # find index of AWB number and the name
+            for word in lines:
+                if word.find("AWB") != 1:
+                    index_awb = lines.index(word) + 1
+                    index_name = index_awb + 1
+                    break
+            
+            # create csv if it doesn't exist, add column names
+            if not(os.path.isfile(csv_path)):
+                with open(csv_path, 'w') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(["Index", "AWB", "Name"])
+
+            # update csv
+            df = pd.read_csv(csv_path)
+            index = df.shape[0]
+            data = [index, lines[index_awb], lines[index_name]]
+            with open(csv_path, 'a') as f:
+                writer = csv.writer(f)
+                writer.writerow(data)
+
+            print("Added")
+            # break
+        # exit loop if q is pressed
         elif key == ord('q'):
             webcam.release()
             cv2.destroyAllWindows()
@@ -38,41 +68,3 @@ while True:
         print("Program ended.")
         cv2.destroyAllWindows()
         break
-
-
-
-imageText = pytesseract.image_to_string(gray)
-
-
-lines = imageText.split('\n')
-lines = list(filter(None, lines))
-print(type(imageText))
-print(imageText)
-print(lines)
-index_awb = 0
-index_name = 0
-for word in lines:
-    if word.find("AWB") != 1:
-        index_awb = lines.index(word) + 1
-        index_name = index_awb + 1
-        break
-
-print("AWB: ", lines[index_awb])
-print("Name: ", lines[index_name])
-
-if os.path.isfile(csv_path):
-    df = pd.read_csv(csv_path)
-    print(df)
-    # new_row = {"AWB": lines[index_awb], "Name": lines[index_name]}
-    # df = df.append(new_row)
-
-    # new_row = pd.Series({"AWB": [lines[index_awb]], "Name": [lines[index_name]]})
-    # df = pd.concat([df, new_row], axis = 0)
-    df.loc[df.shape[0]] = [lines[index_awb], lines[index_name]]
-
-else:
-    data = {"AWB": [str(lines[index_awb])], "Name": [str(lines[index_name])]}
-    df = pd.DataFrame(data)
-
-df.to_csv(csv_path)
-
