@@ -25,6 +25,8 @@ The programs require the following softwares/files/tools:
  * [tesseract](https://github.com/UB-Mannheim/tesseract/wiki)
  * [Droid Cam](https://www.dev47apps.com/droidcam/windows/)
  * A webcam or another video stream source 
+ * pip intall gspread
+ * pip install --upgrade google-api-python-client oauth2client
 
 ## EXECUTION
 ------------

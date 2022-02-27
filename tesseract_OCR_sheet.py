@@ -3,12 +3,30 @@ import pytesseract
 import pandas as pd
 import os
 import csv 
+import gspread
+import pandas as pd
+from oauth2client.service_account import ServiceAccountCredentials
 
 # path to tesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\soumi\AppData\Local\Programs\Tesseract-OCR\tesseract'
 
 # csv path
 csv_path = r'parcels.csv'
+
+# define the scope
+scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+# add credentials to the account
+creds = ServiceAccountCredentials.from_json_keyfile_name('milan-gargi-44af8bc89f09.json', scope)
+# authorize the clientsheet 
+client = gspread.authorize(creds)
+# get the instance of the Spreadsheet
+sheet = client.open('Postal Room')
+# get the first sheet of the Spreadsheet
+sheet_instance = sheet.get_worksheet(0)
+# get all the records of the data
+records_data = sheet_instance.get_all_records()
+# convert the json to dataframe
+records_df = pd.DataFrame.from_dict(records_data)
 
 # scan image
 key = cv2.waitKey(1)
@@ -49,9 +67,10 @@ while True:
             df = pd.read_csv(csv_path)
             index = df.shape[0]
             data = [index, lines[index_awb], lines[index_name]]
-            with open(csv_path, 'a') as f:
-                writer = csv.writer(f)
-                writer.writerow(data)
+            sheet_instance.insert_rows(data)
+            # with open(csv_path, 'a') as f:
+            #     writer = csv.writer(f)
+            #     writer.writerow(data)
 
             print("Added")
             # break
